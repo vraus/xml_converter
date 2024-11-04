@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:ex="http://example.org/schema#">
+
+    <!-- Déclaration d'un livre avec une langue -->
+    <rdf:Description rdf:about="http://example.org/book/1">
+        <dc:title xml:lang="en">The Great Adventure</dc:title>
+        <dc:creator rdf:resource="http://example.org/author/123"/>
+        <ex:genre rdf:resource="http://example.org/genre/adventure"/>
+        <ex:publicationYear rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2020</ex:publicationYear>
+    </rdf:Description>
+
+    <!-- Déclaration de l'auteur du livre -->
+    <rdf:Description rdf:about="http://example.org/author/123">
+        <dc:name xml:lang="en">John Doe</dc:name>
+        <ex:nationality rdf:datatype="http://www.w3.org/2001/XMLSchema#string">American</ex:nationality>
+        <ex:birthYear rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1980</ex:birthYear>
+    </rdf:Description>
+
+    <!-- Déclaration d'un autre livre en français avec une balise nodeID -->
+    <rdf:Description rdf:nodeID="book2">
+        <dc:title xml:lang="fr">L'Aventure Épique</dc:title>
+        <dc:creator rdf:resource="http://example.org/author/456"/>
+        <ex:genre rdf:resource="http://example.org/genre/fantasy"/>
+        <ex:publicationYear rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2018</ex:publicationYear>
+    </rdf:Description>
+
+    <!-- Déclaration de l'auteur du deuxième livre -->
+    <rdf:Description rdf:about="http://example.org/author/456">
+        <dc:name xml:lang="fr">Marie Dupont</dc:name>
+        <ex:nationality rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Française</ex:nationality>
+        <ex:birthYear rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1975</ex:birthYear>
+    </rdf:Description>
+
+    <!-- Déclaration de genres littéraires -->
+    <rdf:Description rdf:about="http://example.org/genre/adventure">
+        <dc:description xml:lang="en">Adventure</dc:description>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://example.org/genre/fantasy">
+        <dc:description xml:lang="fr">Fantaisie</dc:description>
+    </rdf:Description>
+
+</rdf:RDF>

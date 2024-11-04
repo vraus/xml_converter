@@ -1,0 +1,32 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:ex="http://example.org/"
+         xmlns:eco="http://example.org/ecology#">
+
+    <ex:NationalPark rdf:about="http://example.org/parks/park1">
+        <ex:name xml:lang="en">Green Valley National Park</ex:name>
+        <ex:location rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mountain Region</ex:location>
+        <ex:animal rdf:nodeID="animal1"/>
+        <ex:animal rdf:nodeID="animal2"/>
+    </ex:NationalPark>
+
+    <eco:Animal rdf:nodeID="animal1">
+        <eco:species rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Gray Wolf</eco:species>
+        <eco:habitat rdf:resource="http://example.org/habitats/forest"/>
+    </eco:Animal>
+
+    <eco:Animal rdf:nodeID="animal2">
+        <eco:species rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bald Eagle</eco:species>
+        <eco:habitat rdf:resource="http://example.org/habitats/mountain"/>
+    </eco:Animal>
+
+    <eco:Habitat rdf:about="http://example.org/habitats/forest">
+        <eco:name xml:lang="en">Forest</eco:name>
+        <eco:averagePrecipitation rdf:datatype="http://www.w3.org/2001/XMLSchema#float">150.5</eco:averagePrecipitation>
+    </eco:Habitat>
+
+    <eco:Habitat rdf:about="http://example.org/habitats/mountain">
+        <eco:name xml:lang="en">Mountain</eco:name>
+        <eco:averagePrecipitation rdf:datatype="http://www.w3.org/2001/XMLSchema#float">80.0</eco:averagePrecipitation>
+    </eco:Habitat>
+
+</rdf:RDF>

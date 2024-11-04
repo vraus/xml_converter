@@ -1,0 +1,30 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:ex="http://example.org/"
+         xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
+
+    <ex:TrainLine rdf:about="http://example.org/lines/lineA">
+        <ex:name xml:lang="en">Line A</ex:name>
+        <ex:startStation rdf:resource="http://example.org/stations/station1"/>
+        <ex:endStation rdf:resource="http://example.org/stations/station3"/>
+        <ex:dailyRidership rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">50000</ex:dailyRidership>
+    </ex:TrainLine>
+
+    <ex:Station rdf:about="http://example.org/stations/station1">
+        <ex:name xml:lang="en">Central Station</ex:name>
+        <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#float">40.7128</geo:lat>
+        <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#float">-74.0060</geo:long>
+    </ex:Station>
+
+    <ex:Station rdf:about="http://example.org/stations/station2">
+        <ex:name xml:lang="en">Midtown Station</ex:name>
+        <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#float">40.7580</geo:lat>
+        <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#float">-73.9855</geo:long>
+    </ex:Station>
+
+    <ex:Station rdf:about="http://example.org/stations/station3">
+        <ex:name xml:lang="en">Harbor Station</ex:name>
+        <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#float">40.7033</geo:lat>
+        <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#float">-74.0170</geo:long>
+    </ex:Station>
+
+</rdf:RDF>

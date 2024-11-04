@@ -1,0 +1,18 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:ex="http://example.org/"
+    xmlns:dc="http://purl.org/dc/terms/">
+
+    <ex:Book rdf:about="http://example.org/books/book1">
+        <dc:title xml:lang="en">The Great Adventure</dc:title>
+        <ex:description xml:lang="fr">Une aventure EPIC</ex:description>
+        <ex:description xml:lang="en">An EPIC adventure</ex:description>
+        <ex:author rdf:nodeID="author1"/>
+        <ex:publicationYear rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2021</ex:publicationYear>
+    </ex:Book>
+
+    <ex:Author rdf:nodeID="author1">
+        <ex:name>Jane Doe</ex:name>
+        <ex:profile rdf:resource="http://example.org/authors/janedoe"/>
+    </ex:Author>
+
+</rdf:RDF>
