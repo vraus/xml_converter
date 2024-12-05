@@ -6,19 +6,21 @@ Converter::Converter(const std::string &filePath, const std::string &fileName)
 
     patterns = {
         {std::regex(R"(<([a-zA-Z0-9]+):([a-zA-Z0-9]+)\s+rdf:about=\"([^\"]+)\">)"), Types::about},
+        {std::regex(R"(<rdf:Description\s+rdf:nodeID=\"([^\"]+)\">)"), Types::descriptionNodeID},
         {std::regex(R"(<([a-zA-Z0-9]+):([a-zA-Z0-9]+)\s+rdf:nodeID=\"([^\"]+)\">)"), Types::parentNodeID},
         {std::regex(R"(<([a-zA-Z0-9]+):([a-zA-Z0-9]+)\s+rdf:nodeID=\"([^\"]+)\"/>)"), Types::childNodeID},
         {std::regex(R"(<([a-zA-Z0-9]+):([a-zA-Z0-9]+)\s+rdf:resource=\"([^\"]+)\")"), Types::resource},
         {std::regex(R"(<([a-zA-Z0-9]+):([a-zA-Z0-9]+)\s+rdf:datatype=\"([^\"]+)\">([^<]*)</\1:\2>)"), Types::datatype},
         {std::regex(R"(<([a-zA-Z0-9]+):([a-zA-Z0-9]+)\s+xml:lang=\"([a-zA-Z\-]+)\">([^<]*)</\1:\2>)"), Types::langLiteral},
         {std::regex(R"(<([a-zA-Z0-9]+):([a-zA-Z0-9]+)>([^<]*)</\1:\2>)"), Types::literal},
-        {std::regex(R"(</([a-zA-Z0-9]+):([a-zA-Z0-9]+)>)"), Types::closingTag}};
+        {std::regex(R"(</([a-zA-Z0-9]+):([a-zA-Z0-9]+)>)"), Types::closingTag},
+        {std::regex(R"(<([a-zA-Z0-9]+):([a-zA-Z0-9]+)\s+([^>]+)/>)"), Types::selfClosingTag},
+    };
 
     this->fileName = fileName;
 }
 
 Converter::~Converter() = default;
-
 void Converter::convertXml()
 {
     std::istringstream stream(xmlContent);
@@ -66,6 +68,9 @@ void Converter::processNamespaces(const std::string &line)
 
 void Converter::processLine(const std::string &line)
 {
+    std::cout << "Under the process of treating line\n\t"
+              << line << "\n";
+
     for (const auto &pattern : patterns)
     {
         auto matchResult = pattern.match(line);
@@ -78,6 +83,9 @@ void Converter::processLine(const std::string &line)
             case Types::about:
                 processAboutTag(match);
                 break;
+            case Types::descriptionNodeID:
+                processDescriptionNodeID(match);
+                return;
             case Types::childNodeID:
                 processChildNodeID(match);
                 break;
@@ -98,6 +106,9 @@ void Converter::processLine(const std::string &line)
                 break;
             case Types::closingTag:
                 processClosingTag(match);
+                break;
+            case Types::selfClosingTag:
+                processSelfClosingTag(match);
                 break;
             default:
                 // Ignore lines not recognized by the regex
@@ -143,6 +154,17 @@ void Converter::processAboutTag(const std::smatch &match)
     outputFile << createTriple(subject, predicat, object);
 }
 
+void Converter::processDescriptionNodeID(const std::smatch &match)
+{
+    std::string uri = match[1].str();
+    if (namespaces.find(uri) == namespaces.end())
+    {
+        std::string generatedNodeId = "_:genid" + std::to_string(++blankNodeCounter);
+        namespaces[uri] = generatedNodeId;
+        element.push(namespaces[uri]);
+    }
+}
+
 void Converter::processChildNodeID(const std::smatch &match)
 {
     std::string predicat = "<" + replaceNamespacePrefixes(match[1].str() + ":" + match[2].str()) + ">";
@@ -162,6 +184,7 @@ void Converter::processChildNodeID(const std::smatch &match)
 
 void Converter::processParentNodeID(const std::smatch &match)
 {
+
     std::string object = "<" + replaceNamespacePrefixes(match[1].str() + ':' + match[2].str()) + ">";
     std::string uri = match[3].str();
     std::string predicat = "<" + replaceNamespacePrefixes("rdf:type") + ">";
@@ -216,11 +239,61 @@ void Converter::processLiteralTag(const std::smatch &match)
 
 void Converter::processClosingTag(const std::smatch &match)
 {
-    std::string closingKey = match[1].str() + ":" + match[2].str();
-    if (namespaces.find(closingKey) != namespaces.end())
+    if (element.empty())
     {
-        std::string expectedURI = namespaces[closingKey];
-        if (element.top() == expectedURI)
-            element.pop();
+        std::cerr << "Error: Trying to pop an empty stack for closing tag: </"
+                  << match[1].str() << ":" << match[2].str() << ">\n";
+        throw std::runtime_error("Error: Stack underflow in processClosingTag.");
+    }
+
+    std::string closingKey = match[1].str() + ":" + match[2].str();
+    std::string expectedURI = element.top();
+
+    // Match the closing tag to the current subject in the stack
+    if (namespaces.find(closingKey) != namespaces.end() &&
+        namespaces[closingKey] == expectedURI)
+    {
+        element.pop();
+        std::cout << "Popped from stack: " << expectedURI << "\n";
+    }
+    else
+    {
+        std::cerr << "Warning: Closing tag </" << match[1].str() << ":" << match[2].str()
+                  << "> does not match current stack element.\n";
+    }
+}
+
+void Converter::processSelfClosingTag(const std::smatch &match)
+{
+    std::string subject = element.top();
+    std::string predicat = "<" + replaceNamespacePrefixes(match[1].str() + ":" + match[2].str()) + ">";
+
+    // Gérer les attributs dans la balise (par exemple, `rdf:nodeID` ou `rdf:resource`)
+    std::regex attributeRegex(R"((rdf:nodeID|rdf:resource)=\"([^\"]+)\")");
+    std::smatch attributeMatch;
+    std::string attributes = match[3].str();
+
+    if (std::regex_search(attributes, attributeMatch, attributeRegex))
+    {
+        std::string attributeType = attributeMatch[1].str();
+        std::string attributeValue = attributeMatch[2].str();
+
+        std::string object;
+        if (attributeType == "rdf:nodeID")
+        {
+            if (namespaces.find(attributeValue) == namespaces.end())
+            {
+                std::string generatedNodeID = "_:genid" + std::to_string(++blankNodeCounter);
+                namespaces[attributeValue] = generatedNodeID;
+            }
+            object = namespaces[attributeValue];
+        }
+        else if (attributeType == "rdf:resource")
+        {
+            object = "<" + attributeValue + ">";
+        }
+
+        // Écrire le triple
+        outputFile << createTriple(subject, predicat, object);
     }
 }

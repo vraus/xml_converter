@@ -14,11 +14,13 @@ enum Types
     about,
     parentNodeID,
     childNodeID,
+    descriptionNodeID,
     resource,
     datatype,
     langLiteral,
     literal,
-    closingTag
+    closingTag,
+    selfClosingTag
 };
 
 struct Pattern
@@ -54,6 +56,7 @@ private:
     std::string createTriple(const std::string &subject, const std::string &predicat, const std::string &object) const;
 
     void processAboutTag(const std::smatch &match);
+    void processDescriptionNodeID(const std::smatch &match);
     void processParentNodeID(const std::smatch &match);
     void processChildNodeID(const std::smatch &match);
     void processResourceTag(const std::smatch &match);
@@ -61,6 +64,7 @@ private:
     void processLangLiteralTag(const std::smatch &match);
     void processLiteralTag(const std::smatch &match);
     void processClosingTag(const std::smatch &match);
+    void processSelfClosingTag(const std::smatch &match);
 
     std::string xmlContent;
     std::stack<std::string> element;
